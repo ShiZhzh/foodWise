@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- 背景图片 -->
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/beijing"
+        android:scaleType="centerCrop"/>
+
+    <!-- 半透明白色遮罩 -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#C0FFFFFF"/>
+
+    <!-- 原有内容 -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <!-- 标题栏 - 使用RelativeLayout实现左侧返回键+居中标题（与菜品推荐一致） -->
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp">
+
+                <!-- 返回键固定在左侧 -->
+                <TextView
+                    android:id="@+id/btn_back"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:text="←"
+                    android:textSize="24sp"
+                    android:textColor="#333"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:padding="8dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentTop="true"/>
+
+                <!-- 标题居中显示，垂直方向与返回键底部对齐 -->
+                <TextView
+                    android:id="@+id/tv_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="菜品分析"
+                    android:textSize="24sp"
+                    android:textStyle="bold"
+                    android:layout_centerHorizontal="true"
+                    android:layout_alignBottom="@id/btn_back"/>
+            </RelativeLayout>
+
+            <!-- 菜单识别区域：图片+透明悬浮按钮 -->
+            <FrameLayout
+                android:id="@+id/frame_menu"
+                android:layout_width="match_parent"
+                android:layout_height="220dp"
+                android:layout_marginTop="20dp">
+
+                <!-- 菜单背景图片 -->
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/caidan"
+                    android:scaleType="centerCrop"
+                    android:contentDescription="菜单图片"/>
+
+                <!-- 半透明遮罩 -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="#40000000"/>
+
+                <!-- 透明悬浮按钮 -->
+                <Button
+                    android:id="@+id/btn_menu_recognition"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="识别菜单\n(OCR识别菜单目录)"
+                    android:textSize="16sp"
+                    android:background="@android:color/transparent"
+                    android:textColor="#FFFFFF"
+                    android:textStyle="bold"
+                    android:paddingStart="30dp"
+                    android:paddingEnd="30dp"
+                    android:paddingTop="15dp"
+                    android:paddingBottom="15dp"
+                    android:layout_gravity="center"/>
+            </FrameLayout>
+
+            <!-- 菜品识别区域：图片+透明悬浮按钮 -->
+            <FrameLayout
+                android:id="@+id/frame_dish"
+                android:layout_width="match_parent"
+                android:layout_height="220dp"
+                android:layout_marginTop="30dp">
+
+                <!-- 美食背景图片 -->
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/meishi"
+                    android:scaleType="centerCrop"
+                    android:contentDescription="美食图片"/>
+
+                <!-- 半透明遮罩 -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="#40000000"/>
+
+                <!-- 透明悬浮按钮 -->
+                <Button
+                    android:id="@+id/btn_dish_recognition"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="识别菜品图片\n(直接识别卡路里)"
+                    android:textSize="16sp"
+                    android:background="@android:color/transparent"
+                    android:textColor="#FFFFFF"
+                    android:textStyle="bold"
+                    android:paddingStart="30dp"
+                    android:paddingEnd="30dp"
+                    android:paddingTop="15dp"
+                    android:paddingBottom="15dp"
+                    android:layout_gravity="center"/>
+            </FrameLayout>
+
+        </LinearLayout>
+    </ScrollView>
+</FrameLayout>

@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- 背景图片 -->
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/beijing"
+        android:scaleType="centerCrop"/>
+
+    <!-- 半透明白色遮罩 -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#C0FFFFFF"/>
+
+    <!-- 原有内容 -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- 标题栏 - 使用RelativeLayout实现左侧返回键+居中标题 -->
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp">
+
+                <!-- 返回键固定在左侧 -->
+                <TextView
+                    android:id="@+id/btn_back"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:text="←"
+                    android:textSize="24sp"
+                    android:textColor="#333"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:padding="8dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentTop="true"/>
+
+                <!-- 标题居中显示，垂直方向与返回键底部对齐 -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="美食推荐"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:layout_centerHorizontal="true"
+                    android:layout_alignBottom="@id/btn_back"/>
+            </RelativeLayout>
+
+            <!-- 推荐类型选择区（使用图片背景） -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="选择推荐类型"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="15dp"/>
+
+            <RadioGroup
+                android:id="@+id/rg_recommend_type"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <!-- 低卡 -->
+                <FrameLayout
+                    android:id="@+id/frame_weight_loss"
+                    android:layout_width="match_parent"
+                    android:layout_height="120dp"
+                    android:layout_marginBottom="15dp"
+                    android:clickable="true"
+                    android:focusable="true">
+                    
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:src="@drawable/dika"
+                        android:scaleType="centerCrop"/>
+                    
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="#60000000"/>
+                    
+                    <RadioButton
+                        android:id="@+id/rb_weight_loss"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:text="低卡"
+                        android:textSize="24sp"
+                        android:textColor="#FFFFFF"
+                        android:textStyle="bold"
+                        android:gravity="center"
+                        android:button="@null"
+                        android:background="@android:color/transparent"
+                        android:clickable="false"/>
+                </FrameLayout>
+
+                <!-- 高蛋白 -->
+                <FrameLayout
+                    android:id="@+id/frame_weight_gain"
+                    android:layout_width="match_parent"
+                    android:layout_height="120dp"
+                    android:layout_marginBottom="15dp"
+                    android:clickable="true"
+                    android:focusable="true">
+                    
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:src="@drawable/gaodanbai"
+                        android:scaleType="centerCrop"/>
+                    
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="#60000000"/>
+                    
+                    <RadioButton
+                        android:id="@+id/rb_weight_gain"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:text="高蛋白"
+                        android:textSize="24sp"
+                        android:textColor="#FFFFFF"
+                        android:textStyle="bold"
+                        android:gravity="center"
+                        android:button="@null"
+                        android:background="@android:color/transparent"
+                        android:clickable="false"/>
+                </FrameLayout>
+
+                <!-- 高纤维 -->
+                <FrameLayout
+                    android:id="@+id/frame_home_cooking"
+                    android:layout_width="match_parent"
+                    android:layout_height="120dp"
+                    android:layout_marginBottom="15dp"
+                    android:clickable="true"
+                    android:focusable="true">
+                    
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:src="@drawable/gaoxianwei"
+                        android:scaleType="centerCrop"/>
+                    
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="#60000000"/>
+                    
+                    <RadioButton
+                        android:id="@+id/rb_home_cooking"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:text="高纤维"
+                        android:textSize="24sp"
+                        android:textColor="#FFFFFF"
+                        android:textStyle="bold"
+                        android:gravity="center"
+                        android:button="@null"
+                        android:background="@android:color/transparent"
+                        android:clickable="false"/>
+                </FrameLayout>
+
+                <!-- 高钙 -->
+                <FrameLayout
+                    android:id="@+id/frame_quick_meal"
+                    android:layout_width="match_parent"
+                    android:layout_height="120dp"
+                    android:layout_marginBottom="15dp"
+                    android:clickable="true"
+                    android:focusable="true">
+                    
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:src="@drawable/gaogai"
+                        android:scaleType="centerCrop"/>
+                    
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="#60000000"/>
+                    
+                    <RadioButton
+                        android:id="@+id/rb_quick_meal"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:text="高钙"
+                        android:textSize="24sp"
+                        android:textColor="#FFFFFF"
+                        android:textStyle="bold"
+                        android:gravity="center"
+                        android:button="@null"
+                        android:background="@android:color/transparent"
+                        android:clickable="false"/>
+                </FrameLayout>
+
+            </RadioGroup>
+
+            <!-- 获取推荐按钮 -->
+            <Button
+                android:id="@+id/btn_get_recommend"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="获取推荐菜品"
+                android:backgroundTint="#3fe95d"
+                android:layout_gravity="center"
+                android:layout_marginTop="10dp"/>
+
+            <!-- 推荐结果区（空状态提示，简化） -->
+            <TextView
+                android:id="@+id/tv_recommend_empty"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="选择类型并点击「获取推荐菜品」查看结果"
+                android:textSize="14sp"
+                android:textColor="@android:color/darker_gray"
+                android:layout_gravity="center"
+                android:layout_marginTop="20dp"/>
+
+            <!-- 换一批按钮（默认隐藏） -->
+            <Button
+                android:id="@+id/btn_refresh_recommend"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="换一批"
+                android:layout_gravity="end"
+                android:layout_marginTop="10dp"
+                android:visibility="gone"/>
+
+            <!-- 分割线 -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@android:color/darker_gray"
+                android:layout_marginTop="20dp"/>
+
+            <!-- 关联搜索区（简化） -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="根据已有菜品找搭配"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginTop="20dp"/>
+
+            <AutoCompleteTextView
+                android:id="@+id/actv_dish_search"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="输入/选择已有菜品"
+                android:layout_marginTop="10dp"
+                android:inputType="text"/>
+
+            <Button
+                android:id="@+id/btn_search_related"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="搜索相关菜品"
+                android:backgroundTint="#3fe95d"
+                android:layout_gravity="end"
+                android:layout_marginTop="10dp"/>
+
+            <!-- 相关菜品区（空状态提示） -->
+            <TextView
+                android:id="@+id/tv_related_empty"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="输入菜品名称并点击「搜索相关菜品」查看结果"
+                android:textSize="14sp"
+                android:textColor="@android:color/darker_gray"
+                android:layout_gravity="center"
+                android:layout_marginTop="20dp"/>
+
+        </LinearLayout>
+    </ScrollView>
+</FrameLayout>

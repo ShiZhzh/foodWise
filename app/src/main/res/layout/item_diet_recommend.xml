@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="120dp"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="10dp"
+    android:background="@drawable/bg_diet_item"
+    android:layout_marginEnd="10dp">
+
+    <TextView
+        android:id="@+id/tv_dish_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="全麦面包+鸡蛋"
+        android:textSize="14sp"
+        android:textStyle="bold"/>
+
+    <TextView
+        android:id="@+id/tv_dish_calorie"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="350 kcal"
+        android:textSize="12sp"
+        android:textColor="#666666"
+        android:layout_marginTop="8dp"/>
+
+</LinearLayout>

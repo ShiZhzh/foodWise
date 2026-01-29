@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- 背景图片 -->
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/beijing"
+        android:scaleType="centerCrop"/>
+
+    <!-- 半透明白色遮罩 -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#C0FFFFFF"/>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:id="@+id/btn_back"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:text="←"
+                android:textSize="28sp"
+                android:textColor="#333"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:padding="10dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true"
+                android:elevation="8dp"
+                android:layout_marginBottom="10dp"/>
+
+
+            <!-- 1. 用户信息卡片 -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp"
+                android:layout_marginBottom="20dp">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="#16E9C6"
+                    android:padding="20dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <ImageView
+                        android:layout_width="70dp"
+                        android:layout_height="70dp"
+                        android:src="@android:drawable/ic_menu_myplaces"
+                        android:background="#fff"
+                        android:padding="10dp"
+                        android:layout_marginEnd="15dp"/>
+
+                    <!-- 用户信息卡片内的LinearLayout -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+                        <!-- 把固定文本改成带id的TextView -->
+                        <TextView
+                            android:id="@+id/tv_user_name"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="用户加载中..."
+                        android:textSize="20sp"
+                        android:textColor="#fff"
+                        android:textStyle="bold"/>
+                        <TextView
+                            android:id="@+id/tv_user_id"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="ID: 加载中..."
+                        android:textSize="14sp"
+                        android:textColor="#f0f0f0"
+                        android:layout_marginTop="4dp"/>
+                    </LinearLayout>
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@android:drawable/ic_menu_edit"
+                        app:tint="#fff"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- 2. 体重管理卡片（原身体数据卡片） -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp"
+                android:layout_marginBottom="20dp">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="#fff"
+                    android:padding="20dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="体重管理"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="#333"/>
+
+                    <!-- 体重输入 -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_marginTop="15dp">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="今日体重(kg)"
+                            android:textSize="14sp"
+                            android:textColor="#666"/>
+                        <EditText
+                            android:id="@+id/et_weight"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="请输入体重（如65.5）"
+                            android:inputType="numberDecimal"
+                            android:background="@drawable/input_border"
+                            android:padding="10dp"
+                            android:layout_marginTop="5dp"/>
+                    </LinearLayout>
+
+                    <!-- 保存体重按钮 -->
+                    <Button
+                        android:id="@+id/btn_save_weight"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="保存体重"
+                        android:textSize="16sp"
+                        android:backgroundTint="#3fe95d"
+                        android:layout_marginTop="20dp"/>
+
+                    <!-- 体重状态 -->
+                    <TextView
+                        android:id="@+id/tv_weight_status"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="加载中..."
+                        android:textSize="14sp"
+                        android:textColor="#666"
+                        android:layout_gravity="center"
+                        android:layout_marginTop="15dp"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- 3. 体重趋势图表 -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp"
+                android:layout_marginBottom="20dp">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="#fff"
+                    android:padding="20dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="体重趋势"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="#333"/>
+
+                    <com.github.mikephil.charting.charts.LineChart
+                        android:id="@+id/chart_weight"
+                        android:layout_width="match_parent"
+                        android:layout_height="250dp"
+                        android:layout_marginTop="15dp"/>
+
+                    <TextView
+                        android:id="@+id/tv_weight_stats"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="加载统计中..."
+                        android:textSize="12sp"
+                        android:textColor="#666"
+                        android:background="#F5F5F5"
+                        android:padding="10dp"
+                        android:layout_marginTop="10dp"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- 4. 智能饮食推荐 -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp"
+                android:layout_marginBottom="20dp">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="#fff"
+                    android:padding="20dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="智能饮食推荐"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="#333"/>
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rv_diet_recommend"
+                        android:layout_width="match_parent"
+                        android:layout_height="150dp"
+                        android:layout_marginTop="15dp"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- 5. 今日摄入记录入口 -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/card_today_intake"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="#fff"
+                    android:padding="20dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="今日摄入记录"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
+                            android:textColor="#333"/>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="记录今天吃的食物，统计热量"
+                            android:textSize="14sp"
+                            android:textColor="#666"
+                            android:layout_marginTop="4dp"/>
+                    </LinearLayout>
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@android:drawable/ic_media_next"
+                        app:tint="#3fe95d"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+        </LinearLayout>
+    </ScrollView>
+</FrameLayout>

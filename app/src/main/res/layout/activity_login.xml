@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- 背景图片 -->
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/beijing2"
+        android:scaleType="centerCrop"/>
+
+    <!-- 半透明白色遮罩 -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#A0FFFFFF"/>
+
+    <!-- 原有内容 -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="30dp">
+
+            <ImageView
+                android:id="@+id/tv_login_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginBottom="40dp"
+                android:src="@drawable/food_title"
+                android:adjustViewBounds="true"
+                android:scaleType="fitCenter"
+                app:layout_constraintBottom_toTopOf="@id/card_username"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintVertical_chainStyle="packed"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <!-- 用户名输入框（原ID改为username） -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_username"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="4dp"
+                app:layout_constraintTop_toBottomOf="@id/tv_login_title"
+                app:layout_constraintBottom_toTopOf="@id/card_password"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginBottom="16dp">
+
+                <EditText
+                    android:id="@+id/et_username"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:hint="请输入用户名"
+                    android:inputType="text"
+                    android:textSize="18sp"
+                    android:padding="15dp"
+                    android:background="@android:color/white"
+                    android:drawableStart="@android:drawable/ic_menu_myplaces"
+                    android:drawablePadding="10dp"/>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- 新增：密码输入框 -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_password"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="4dp"
+                app:layout_constraintTop_toBottomOf="@id/card_username"
+                app:layout_constraintBottom_toTopOf="@id/btn_login"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <EditText
+                    android:id="@+id/et_password"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:hint="请输入密码"
+                    android:inputType="textPassword"
+                    android:textSize="18sp"
+                    android:padding="15dp"
+                    android:background="@android:color/white"
+                    android:drawableStart="@android:drawable/ic_lock_lock"
+                    android:drawablePadding="10dp"/>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_login"
+                android:layout_width="0dp"
+                android:layout_height="60dp"
+                android:text="登录"
+                android:textSize="18sp"
+                android:textColor="#FFFFFF"
+                app:backgroundTint="#3fe95d"
+                app:cornerRadius="30dp"
+                app:elevation="6dp"
+                app:layout_constraintTop_toBottomOf="@id/card_password"
+                app:layout_constraintBottom_toTopOf="@id/tv_go_register"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginTop="30dp"/>
+
+            <!-- 新增：注册入口 -->
+            <TextView
+                android:id="@+id/tv_go_register"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="还没有账号？立即注册"
+                android:textSize="15sp"
+                android:textColor="#3fe95d"
+                android:padding="8dp"
+                android:alpha="0"
+                app:layout_constraintTop_toBottomOf="@id/btn_login"
+                app:layout_constraintBottom_toTopOf="@id/tv_slogan"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginTop="16dp"/>
+
+            <TextView
+                android:id="@+id/tv_slogan"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="您的健康生活管家"
+                android:textSize="16sp"
+                android:textColor="#666666"
+                android:alpha="0"
+                app:layout_constraintTop_toBottomOf="@id/tv_go_register"
+                app:layout_constraintBottom_toTopOf="@id/tv_team"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginTop="30dp"/>
+
+            <TextView
+                android:id="@+id/tv_team"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="by 队长爱做饭团队"
+                android:textSize="14sp"
+                android:textColor="#999999"
+                android:alpha="0"
+                app:layout_constraintTop_toBottomOf="@id/tv_slogan"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginTop="8dp"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+</FrameLayout>

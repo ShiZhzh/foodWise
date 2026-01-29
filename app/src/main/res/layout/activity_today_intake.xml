@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- 背景图片 -->
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/beijing"
+        android:scaleType="centerCrop"/>
+
+    <!-- 半透明白色遮罩 -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#C0FFFFFF"/>
+
+    <!-- 原有内容 -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- 返回按钮 -->
+            <TextView
+                android:id="@+id/btn_back"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:text="←"
+                android:textSize="22sp"
+                android:textColor="#333"
+                android:gravity="center"
+                android:padding="6dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true"
+                android:layout_marginBottom="12dp"/>
+
+            <!-- 页面标题 -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="今日摄入记录"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="#333"
+                android:layout_marginBottom="20dp"/>
+
+            <!-- 新增摄入项 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="20dp">
+                <EditText
+                    android:id="@+id/et_food_name"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:hint="输入食物名称（如：苹果）"
+                    android:background="@drawable/input_border"
+                    android:padding="10dp"/>
+                <EditText
+                    android:id="@+id/et_calorie"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:hint="热量(kcal)"
+                    android:inputType="number"
+                    android:background="@drawable/input_border"
+                    android:padding="10dp"
+                    android:layout_marginStart="10dp"/>
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/btn_add_food"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:text="添加摄入项"
+                android:textSize="16sp"
+                android:backgroundTint="#3fe95d"
+                android:textColor="#FFFFFF"
+                android:layout_marginBottom="20dp"/>
+
+            <!-- 总计热量 -->
+            <TextView
+                android:id="@+id/tv_total_calorie"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="今日总计摄入：0 kcal"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#333"
+                android:layout_marginBottom="20dp"/>
+
+            <!-- 摄入列表 -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="摄入列表"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#333"
+                android:layout_marginBottom="10dp"/>
+
+            <TextView
+                android:id="@+id/tv_food_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="暂无摄入记录"
+                android:textSize="14sp"
+                android:textColor="#666"
+                android:background="#fff"
+                android:padding="10dp"
+                android:minHeight="100dp"/>
+
+            <!-- 清空记录按钮 -->
+            <Button
+                android:id="@+id/btn_clear_all"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:text="清空今日记录"
+                android:textSize="16sp"
+                android:backgroundTint="#FF5252"
+                android:textColor="#FFFFFF"
+                android:layout_marginTop="20dp"/>
+
+        </LinearLayout>
+    </ScrollView>
+</FrameLayout>

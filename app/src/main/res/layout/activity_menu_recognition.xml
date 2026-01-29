@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- 背景图片 -->
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/beijing"
+        android:scaleType="centerCrop"/>
+
+    <!-- 半透明白色遮罩 -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#C0FFFFFF"/>
+
+    <!-- 原有内容 -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="20dp">
+
+            <TextView
+                android:id="@+id/tv_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="菜单识别"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginTop="30dp"/>
+
+            <Button
+                android:id="@+id/btn_choose_menu"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:text="选择菜单图片"
+                android:textSize="18sp"
+                android:backgroundTint="#3fe95d"
+                android:textColor="#FFFFFF"
+                app:layout_constraintTop_toBottomOf="@id/tv_title"
+                android:layout_marginTop="30dp"/>
+
+            <ImageView
+                android:id="@+id/iv_menu"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_marginTop="20dp"
+                android:background="#f5f5f5"
+                android:scaleType="centerCrop"
+                app:layout_constraintTop_toBottomOf="@id/btn_choose_menu"/>
+
+            <TextView
+                android:id="@+id/tv_loading"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="正在识别菜单..."
+                android:textSize="14sp"
+                android:gravity="center"
+                android:visibility="gone"
+                app:layout_constraintTop_toBottomOf="@id/iv_menu"
+                android:layout_marginTop="15dp"/>
+
+            <!-- 使用NestedScrollView包裹RecyclerView -->
+
+            <androidx.core.widget.NestedScrollView
+                android:id="@+id/nested_scroll"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="20dp"
+                android:minHeight="200dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_loading"
+                app:layout_constraintVertical_bias="0.0"
+                tools:layout_editor_absoluteX="-7dp">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rv_menu_items"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false" />
+            </androidx.core.widget.NestedScrollView>
+
+            <TextView
+                android:id="@+id/btn_back"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:text="←"
+                android:textSize="22sp"
+                android:textColor="#333"
+                android:gravity="center"
+                android:padding="6dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginTop="16dp"
+                android:layout_marginStart="16dp"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+</FrameLayout>

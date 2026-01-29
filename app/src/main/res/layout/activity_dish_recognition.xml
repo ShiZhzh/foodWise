@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- 背景图片 -->
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/beijing"
+        android:scaleType="centerCrop"/>
+
+    <!-- 半透明白色遮罩 -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#C0FFFFFF"/>
+
+    <!-- 原有内容 -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="20dp">
+
+            <TextView
+                android:id="@+id/tv_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="菜品图片识别"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginTop="30dp"/>
+
+            <Button
+                android:id="@+id/btn_choose_dish"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:text="选择菜品图片"
+                android:textSize="18sp"
+                android:backgroundTint="#3fe95d"
+                app:layout_constraintTop_toBottomOf="@id/tv_title"
+                android:layout_marginTop="30dp"/>
+
+            <ImageView
+                android:id="@+id/iv_dish"
+                android:layout_width="match_parent"
+                android:layout_height="250dp"
+                android:layout_marginTop="20dp"
+                android:background="#f5f5f5"
+                android:scaleType="centerCrop"
+                app:layout_constraintTop_toBottomOf="@id/btn_choose_dish"/>
+
+            <TextView
+                android:id="@+id/tv_loading"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="正在识别菜品..."
+                android:textSize="14sp"
+                android:gravity="center"
+                android:visibility="gone"
+                app:layout_constraintTop_toBottomOf="@id/iv_dish"
+                android:layout_marginTop="15dp"/>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/card_result"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="4dp"
+                android:visibility="gone"
+                app:layout_constraintTop_toBottomOf="@id/tv_loading"
+                android:layout_marginTop="20dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="15dp">
+
+                    <TextView
+                        android:id="@+id/tv_dish_name"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="菜品名称："
+                        android:textSize="18sp"
+                        android:textStyle="bold"/>
+
+                    <TextView
+                        android:id="@+id/tv_calorie"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="卡路里："
+                        android:textSize="16sp"
+                        android:layout_marginTop="10dp"/>
+
+                    <TextView
+                        android:id="@+id/tv_allergens"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="过敏源："
+                        android:textSize="16sp"
+                        android:layout_marginTop="10dp"/>
+
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <TextView
+                android:id="@+id/btn_back"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:text="←"
+                android:textSize="22sp"
+                android:textColor="#333"
+                android:gravity="center"
+                android:padding="6dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginTop="16dp"
+                android:layout_marginStart="16dp"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+</FrameLayout>
