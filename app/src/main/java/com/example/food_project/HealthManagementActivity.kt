@@ -10,9 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import android.content.Intent
-import okhttp3.FormBody
-import okhttp3.Request
-import org.json.JSONObject
+import android.util.Log
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.Entry
@@ -20,15 +18,23 @@ import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.formatter.ValueFormatter
 import androidx.core.content.ContextCompat
+import okhttp3.FormBody
+import okhttp3.Request
+import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.*
 
-// 饮食推荐数据类
-class DietDish(val name: String, val calorie: String)
+class DietDish(
+    val name: String, 
+    val calorie: String,
+    val cookingMethod: String = "",
+    val reason: String = ""
+)
 
-// 饮食推荐适配器（完全基础语法，无简化）
-class DietAdapter(private val dishList: List<DietDish>) : RecyclerView.Adapter<DietAdapter.ViewHolder>() {
-    // 内部类ViewHolder（基础写法）
+class DietAdapter(
+    private val dishList: List<DietDish>,
+    private val onItemClick: (DietDish) -> Unit
+) : RecyclerView.Adapter<DietAdapter.ViewHolder>() {
     inner class ViewHolder(itemView: android.view.View) : RecyclerView.ViewHolder(itemView) {
         val tvName: TextView = itemView.findViewById(R.id.tv_dish_name)
         val tvCalorie: TextView = itemView.findViewById(R.id.tv_dish_calorie)
@@ -44,6 +50,9 @@ class DietAdapter(private val dishList: List<DietDish>) : RecyclerView.Adapter<D
         val dish = dishList[position]
         holder.tvName.text = dish.name
         holder.tvCalorie.text = dish.calorie
+        holder.itemView.setOnClickListener {
+            onItemClick(dish)
+        }
     }
 
     override fun getItemCount(): Int {
@@ -51,9 +60,7 @@ class DietAdapter(private val dishList: List<DietDish>) : RecyclerView.Adapter<D
     }
 }
 
-// 核心Activity
 class HealthManagementActivity : AppCompatActivity() {
-    // 修改：正确声明所有控件
     private lateinit var etWeight: EditText
     private lateinit var btnSaveWeight: Button
     private lateinit var tvWeightStatus: TextView
@@ -64,9 +71,15 @@ class HealthManagementActivity : AppCompatActivity() {
     private lateinit var btnBack: android.view.View
     private lateinit var tvUserName: TextView
     private lateinit var tvUserId: TextView
+    private lateinit var cardUserInfo: CardView
+    private lateinit var btnRefreshDiet: Button
 
     private var loginUserId: String = ""
-    private var loginUsername: String = "" // 新增：存储用户名
+    private var loginUsername: String = ""
+    
+    companion object {
+        private const val TAG = "HealthManagement"
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -74,30 +87,24 @@ class HealthManagementActivity : AppCompatActivity() {
         
         val sharedPref = getSharedPreferences("UserPrefs", MODE_PRIVATE)
         loginUserId = sharedPref.getString("userId", "") ?: ""
-        loginUsername = sharedPref.getString("username", "") ?: "" // 新增：读取用户名
+        loginUsername = sharedPref.getString("username", "") ?: ""
 
         initViews()
         setupWeightChart()
         
-        // 修改：显示用户名而不是用户ID
-        tvUserName.text = if (loginUsername.isEmpty()) {
-            "用户未登录"
-        } else {
-            loginUsername  // 直接显示用户名，如"张三"
-        }
-        tvUserId.text = if (loginUserId.isEmpty()) {
-            "ID: 未设置"
-        } else {
-            "ID: $loginUserId"   // 显示完整的用户ID
-        }
+        tvUserName.text = if (loginUsername.isEmpty()) "用户未登录" else loginUsername
+        tvUserId.text = if (loginUserId.isEmpty()) "ID: 未设置" else "ID: $loginUserId"
         
-        loadDietRecommend(loginUserId)
+        checkAndLoadDietRecommend()
         loadTodayWeight()
         loadWeightHistory()
         setButtonListeners()
+        
+        cardUserInfo.setOnClickListener {
+            startActivity(Intent(this, UserDetailActivity::class.java))
+        }
     }
 
-    // 修改：绑定正确的控件ID（与布局文件匹配）
     private fun initViews() {
         etWeight = findViewById(R.id.et_weight)
         btnSaveWeight = findViewById(R.id.btn_save_weight)
@@ -109,9 +116,10 @@ class HealthManagementActivity : AppCompatActivity() {
         btnBack = findViewById(R.id.btn_back)
         tvUserName = findViewById(R.id.tv_user_name)
         tvUserId = findViewById(R.id.tv_user_id)
+        cardUserInfo = findViewById(R.id.card_user_info)
+        btnRefreshDiet = findViewById(R.id.btn_refresh_diet)
     }
 
-    // 新增：初始化体重趋势图表
     private fun setupWeightChart() {
         chartWeight.apply {
             description.isEnabled = true
@@ -140,7 +148,24 @@ class HealthManagementActivity : AppCompatActivity() {
         }
     }
 
-    // 新增:加载今日体重
+    private fun checkAndLoadDietRecommend() {
+        if (DietRecommendCache.hasLoaded(loginUserId)) {
+            // 使用全局缓存的数据
+            Log.d(TAG, "使用全局缓存的AI推荐数据")
+            val cachedDishes = DietRecommendCache.getDishes()
+            val overallReason = DietRecommendCache.getOverallReason()
+            
+            initDietListWithData(cachedDishes)
+            if (overallReason.isNotEmpty()) {
+                Toast.makeText(this, "AI推荐(已缓存): $overallReason", Toast.LENGTH_SHORT).show()
+            }
+        } else {
+            // 首次加载，从服务器获取
+            Log.d(TAG, "首次加载，从服务器获取AI推荐")
+            loadAIDietRecommend(loginUserId)
+        }
+    }
+
     private fun loadTodayWeight() {
         if (loginUserId.isEmpty()) return
 
@@ -181,7 +206,6 @@ class HealthManagementActivity : AppCompatActivity() {
         }.start()
     }
 
-    // 新增：加载体重历史（近30天）
     private fun loadWeightHistory() {
         if (loginUserId.isEmpty()) return
 
@@ -224,7 +248,6 @@ class HealthManagementActivity : AppCompatActivity() {
         }.start()
     }
 
-    // 新增：绘制体重趋势图
     private fun drawWeightChart(dataArray: org.json.JSONArray) {
         val entries = ArrayList<Entry>()
         val dates = ArrayList<String>()
@@ -263,14 +286,12 @@ class HealthManagementActivity : AppCompatActivity() {
         chartWeight.invalidate()
     }
 
-    // 新增：显示空图表
     private fun showEmptyChart() {
         chartWeight.clear()
         chartWeight.setNoDataText("暂无体重数据")
         chartWeight.invalidate()
     }
 
-    // 新增：加载体重统计信息
     private fun loadWeightStatistics() {
         Thread {
             try {
@@ -316,9 +337,7 @@ class HealthManagementActivity : AppCompatActivity() {
                     }
                 }
             } catch (e: Exception) {
-                runOnUiThread {
-                    tvWeightStats.text = "网络异常"
-                }
+                runOnUiThread { showEmptyChart() }
             }
         }.start()
     }
@@ -328,7 +347,6 @@ class HealthManagementActivity : AppCompatActivity() {
             finish()
         }
 
-        // 修改：保存体重按钮
         btnSaveWeight.setOnClickListener {
             val weightStr = etWeight.text.toString().trim()
 
@@ -349,9 +367,29 @@ class HealthManagementActivity : AppCompatActivity() {
         cardTodayIntake.setOnClickListener {
             startActivity(Intent(this, TodayIntakeActivity::class.java))
         }
+        
+        btnRefreshDiet.setOnClickListener {
+            Log.d(TAG, "用户点击刷新AI推荐按钮")
+            androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("刷新推荐")
+                .setMessage("确定要重新获取AI推荐吗？\n这将花费20-60秒时间。")
+                .setPositiveButton("确定") { _, _ ->
+                    // 清空全局缓存
+                    DietRecommendCache.clear()
+                    
+                    val emptyList = listOf(DietDish("加载中...", "AI推荐生成中，请稍候"))
+                    val layoutManager = LinearLayoutManager(this)
+                    layoutManager.orientation = LinearLayoutManager.HORIZONTAL
+                    rvDietRecommend.layoutManager = layoutManager
+                    rvDietRecommend.adapter = DietAdapter(emptyList) { }
+                    
+                    loadAIDietRecommend(loginUserId)
+                }
+                .setNegativeButton("取消", null)
+                .show()
+        }
     }
 
-    // 新增：保存体重到服务器
     private fun saveWeightToServer(weight: Double) {
         if (loginUserId.isEmpty()) {
             Toast.makeText(this, "请先登录", Toast.LENGTH_SHORT).show()
@@ -409,44 +447,122 @@ class HealthManagementActivity : AppCompatActivity() {
         }.start()
     }
 
-    private fun loadDietRecommend(userId: String) {
+    private fun loadAIDietRecommend(userId: String) {
+        if (userId.isEmpty()) {
+            Log.w(TAG, "loadAIDietRecommend: userId为空，无法加载推荐")
+            showEmptyDietList()
+            return
+        }
+
+        Log.d(TAG, "开始加载AI推荐，userId: $userId")
+        
         Thread {
             try {
+                val url = ApiHelper.getUrl("/api/ai/getDietRecommend?userId=$userId")
+                Log.d(TAG, "请求URL: $url")
+                
                 val request = Request.Builder()
-                    .url(ApiHelper.getUrl("/api/getDietRecommend?userId=$userId"))
+                    .url(url)
                     .get()
                     .build()
 
-                val response = ApiHelper.getClient().newCall(request).execute()
+                Log.d(TAG, "发送AI推荐请求...")
+                val startTime = System.currentTimeMillis()
+                val response = ApiHelper.getAIClient().newCall(request).execute()
+                val elapsedTime = System.currentTimeMillis() - startTime
+                
                 val responseBody = response.body?.string()
+                Log.d(TAG, "收到响应，耗时: ${elapsedTime}ms")
+                Log.d(TAG, "响应状态码: ${response.code}")
+                Log.d(TAG, "响应内容长度: ${responseBody?.length ?: 0} 字符")
+                
+                if (!responseBody.isNullOrEmpty()) {
+                    Log.d(TAG, "响应内容: $responseBody")
+                }
 
                 runOnUiThread {
                     if (response.isSuccessful && !responseBody.isNullOrEmpty()) {
                         try {
                             val json = JSONObject(responseBody)
+                            Log.d(TAG, "JSON解析成功")
+                            
                             if (json.optBoolean("success", false)) {
+                                Log.d(TAG, "AI推荐成功标志为true")
+                                
                                 val dishes = json.getJSONArray("recommendDishes")
+                                val overallReason = json.optString("overallReason", "")
+                                Log.d(TAG, "推荐菜品数量: ${dishes.length()}")
+                                Log.d(TAG, "总体推荐理由: $overallReason")
+                                
                                 val dishList = mutableListOf<DietDish>()
                                 for (i in 0 until dishes.length()) {
                                     val dish = dishes.getJSONObject(i)
+                                    val dishName = dish.getString("dishName")
+                                    Log.d(TAG, "解析菜品 $i: $dishName")
+                                    
+
                                     dishList.add(DietDish(
-                                        dish.getString("dishName"),
-                                        dish.getString("calorie")
+                                        dishName,
+                                        dish.getString("calorie"),
+                                        dish.getString("cookingMethod"),
+                                        dish.getString("reason")
                                     ))
                                 }
+                                
+                                DietRecommendCache.saveDishes(userId, dishList, overallReason)
+                                
                                 initDietListWithData(dishList)
+                                Log.d(TAG, "AI推荐列表初始化完成并已保存到全局缓存")
+                                
+                                if (overallReason.isNotEmpty()) {
+                                    Toast.makeText(this, "AI推荐: $overallReason", Toast.LENGTH_LONG).show()
+                                }
                             } else {
-                                showEmptyDietList()
+                                val error = json.optString("error", "未知错误")
+                                Log.e(TAG, "AI推荐失败，服务器返回错误: $error")
+                                showEmptyDietListWithMessage("服务器错误: $error")
                             }
                         } catch (e: Exception) {
-                            showEmptyDietList()
+                            Log.e(TAG, "JSON解析异常", e)
+                            Log.e(TAG, "异常详情: ${e.javaClass.simpleName} - ${e.message}")
+                            e.printStackTrace()
+                            showEmptyDietListWithMessage("数据解析失败: ${e.message}")
                         }
                     } else {
-                        showEmptyDietList()
+                        Log.e(TAG, "响应失败或为空")
+                        Log.e(TAG, "isSuccessful: ${response.isSuccessful}")
+                        Log.e(TAG, "responseBody.isNullOrEmpty: ${responseBody.isNullOrEmpty()}")
+                        showEmptyDietListWithMessage("HTTP ${response.code}: ${response.message}")
                     }
                 }
+            } catch (e: java.net.SocketTimeoutException) {
+                Log.e(TAG, "AI推荐请求超时", e)
+                runOnUiThread {
+                    val emptyList = listOf(DietDish("AI推荐超时", "服务器响应时间过长(>60秒)"))
+                    val layoutManager = LinearLayoutManager(this)
+                    layoutManager.orientation = LinearLayoutManager.HORIZONTAL
+                    rvDietRecommend.layoutManager = layoutManager
+                    rvDietRecommend.adapter = DietAdapter(emptyList) { }
+                    Toast.makeText(this, "AI推荐超时，请稍后刷新页面重试", Toast.LENGTH_LONG).show()
+                }
+            } catch (e: java.net.UnknownHostException) {
+                Log.e(TAG, "无法连接到服务器: 主机未知", e)
+                runOnUiThread {
+                    showEmptyDietListWithMessage("无法连接服务器: 请检查网络设置")
+                }
+            } catch (e: java.net.ConnectException) {
+                Log.e(TAG, "连接服务器失败", e)
+                runOnUiThread {
+                    showEmptyDietListWithMessage("连接失败: 服务器可能未启动")
+                }
             } catch (e: Exception) {
-                runOnUiThread { showEmptyDietList() }
+                Log.e(TAG, "AI推荐请求异常", e)
+                Log.e(TAG, "异常类型: ${e.javaClass.simpleName}")
+                Log.e(TAG, "异常消息: ${e.message}")
+                e.printStackTrace()
+                runOnUiThread { 
+                    showEmptyDietListWithMessage("网络异常: ${e.javaClass.simpleName}") 
+                }
             }
         }.start()
     }
@@ -455,15 +571,35 @@ class HealthManagementActivity : AppCompatActivity() {
         val layoutManager = LinearLayoutManager(this)
         layoutManager.orientation = LinearLayoutManager.HORIZONTAL
         rvDietRecommend.layoutManager = layoutManager
-        rvDietRecommend.adapter = DietAdapter(dishes)
+        rvDietRecommend.adapter = DietAdapter(dishes) { dish ->
+            showDishDetailDialog(dish)
+        }
     }
 
-    private fun showEmptyDietList() {
-        val emptyList = listOf(DietDish("获取失败", "服务器连接失败"))
+    private fun showDishDetailDialog(dish: DietDish) {
+        val message = StringBuilder()
+        message.append("热量: ${dish.calorie}\n\n")
+        message.append("制作方法:\n${dish.cookingMethod}\n\n")
+        message.append("推荐理由:\n${dish.reason}")
+        
+        androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle(dish.name)
+            .setMessage(message.toString())
+            .setPositiveButton("知道了", null)
+            .show()
+    }
+
+    private fun showEmptyDietListWithMessage(message: String) {
+        Log.w(TAG, "显示错误消息: $message")
+        val emptyList = listOf(DietDish("获取失败", message))
         val layoutManager = LinearLayoutManager(this)
         layoutManager.orientation = LinearLayoutManager.HORIZONTAL
         rvDietRecommend.layoutManager = layoutManager
-        rvDietRecommend.adapter = DietAdapter(emptyList)
-        Toast.makeText(this, "智能餐饮推荐获取失败", Toast.LENGTH_SHORT).show()
+        rvDietRecommend.adapter = DietAdapter(emptyList) { }
+        Toast.makeText(this, "AI推荐: $message", Toast.LENGTH_LONG).show()
+    }
+
+    private fun showEmptyDietList() {
+        showEmptyDietListWithMessage("AI推荐服务异常")
     }
 }

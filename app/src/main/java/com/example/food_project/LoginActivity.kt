@@ -30,6 +30,9 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
+        // 新增：清空上一个用户的缓存
+        DietRecommendCache.clear()
+
         initViews()
         applyAnimations()
         setButtonListeners()

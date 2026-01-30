@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <EditText
+        android:id="@+id/et_target_weight"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="目标体重（kg）"
+        android:inputType="numberDecimal"
+        android:background="@drawable/input_border"
+        android:padding="12dp"
+        android:layout_marginBottom="12dp"/>
+
+    <EditText
+        android:id="@+id/et_nutrition_plan"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="营养计划（如：减脂、增肌）"
+        android:background="@drawable/input_border"
+        android:padding="12dp"
+        android:layout_marginBottom="12dp"/>
+
+    <EditText
+        android:id="@+id/et_plan_desc"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="计划描述（可选）"
+        android:background="@drawable/input_border"
+        android:padding="12dp"
+        android:minLines="3"/>
+
+</LinearLayout>

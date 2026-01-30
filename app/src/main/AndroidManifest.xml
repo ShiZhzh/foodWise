@@ -21,6 +21,10 @@
         android:supportsRtl="true"
         android:theme="@style/Base.Theme.Food_project"
         android:usesCleartextTraffic="true">
+        <!-- 新增：菜品详情Activity -->
+        <activity
+            android:name=".DishDetailActivity"
+            android:exported="false" />
         <activity
             android:name=".TodayIntakeActivity"
             android:exported="false" />
@@ -56,6 +60,9 @@
             android:exported="false" />
         <activity
             android:name=".RegisterActivity"
+            android:exported="false" />
+        <activity
+            android:name=".UserDetailActivity"
             android:exported="false" />
 
     </application>

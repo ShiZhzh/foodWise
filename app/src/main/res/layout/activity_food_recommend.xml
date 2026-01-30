@@ -54,7 +54,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="美食推荐"
+                    android:text="AI美食推荐"
                     android:textSize="20sp"
                     android:textStyle="bold"
                     android:layout_centerHorizontal="true"
@@ -215,28 +215,36 @@
 
             </RadioGroup>
 
-            <!-- 获取推荐按钮 -->
+            <!-- 新增：用户备注输入框（类型推荐） -->
+            <EditText
+                android:id="@+id/et_user_note"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="可选：添加备注（如：制作难度、烹饪时间要求等）"
+                android:background="@drawable/input_border"
+                android:padding="10dp"
+                android:maxLines="2"
+                android:layout_marginBottom="10dp"/>
+
             <Button
                 android:id="@+id/btn_get_recommend"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="获取推荐菜品"
+                android:text="AI推荐菜品"
                 android:backgroundTint="#3fe95d"
                 android:layout_gravity="center"
                 android:layout_marginTop="10dp"/>
 
-            <!-- 推荐结果区（空状态提示，简化） -->
             <TextView
                 android:id="@+id/tv_recommend_empty"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="选择类型并点击「获取推荐菜品」查看结果"
+                android:text="选择类型并点击「AI推荐菜品」查看结果"
                 android:textSize="14sp"
                 android:textColor="@android:color/darker_gray"
                 android:layout_gravity="center"
                 android:layout_marginTop="20dp"/>
 
-            <!-- 换一批按钮（默认隐藏） -->
             <Button
                 android:id="@+id/btn_refresh_recommend"
                 android:layout_width="wrap_content"
@@ -253,38 +261,50 @@
                 android:background="@android:color/darker_gray"
                 android:layout_marginTop="20dp"/>
 
-            <!-- 关联搜索区（简化） -->
+            <!-- 根据食材推荐区 -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="根据已有菜品找搭配"
+                android:text="根据食材智能推荐"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:layout_marginTop="20dp"/>
 
             <AutoCompleteTextView
-                android:id="@+id/actv_dish_search"
+                android:id="@+id/actv_ingredient_search"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="输入/选择已有菜品"
+                android:hint="输入/选择食材（如：西红柿）"
                 android:layout_marginTop="10dp"
+                android:background="@drawable/input_border"
+                android:padding="10dp"
                 android:inputType="text"/>
 
+            <!-- 新增：用户备注输入框（食材推荐） -->
+            <EditText
+                android:id="@+id/et_ingredient_note"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="可选：添加备注（如：简单快手、适合新手等）"
+                android:background="@drawable/input_border"
+                android:padding="10dp"
+                android:maxLines="2"
+                android:layout_marginTop="10dp"/>
+
             <Button
-                android:id="@+id/btn_search_related"
+                android:id="@+id/btn_search_by_ingredient"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="搜索相关菜品"
+                android:text="AI推荐菜品"
                 android:backgroundTint="#3fe95d"
                 android:layout_gravity="end"
                 android:layout_marginTop="10dp"/>
 
-            <!-- 相关菜品区（空状态提示） -->
             <TextView
-                android:id="@+id/tv_related_empty"
+                android:id="@+id/tv_ingredient_empty"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="输入菜品名称并点击「搜索相关菜品」查看结果"
+                android:text="输入食材名称并点击「AI推荐菜品」查看结果"
                 android:textSize="14sp"
                 android:textColor="@android:color/darker_gray"
                 android:layout_gravity="center"

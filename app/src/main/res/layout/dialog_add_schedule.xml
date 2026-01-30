@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <EditText
+        android:id="@+id/et_schedule_time"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="时间（HH:mm，如08:00）"
+        android:inputType="time"
+        android:background="@drawable/input_border"
+        android:padding="12dp"
+        android:layout_marginBottom="12dp"/>
+
+    <EditText
+        android:id="@+id/et_schedule_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="日程内容"
+        android:background="@drawable/input_border"
+        android:padding="12dp"
+        android:minLines="2"/>
+
+</LinearLayout>

@@ -1,28 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<androidx.cardview.widget.CardView 
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="120dp"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="10dp"
-    android:background="@drawable/bg_diet_item"
-    android:layout_marginEnd="10dp">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="160dp"
+    android:layout_height="wrap_content"
+    android:layout_marginEnd="12dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="3dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground">
 
-    <TextView
-        android:id="@+id/tv_dish_name"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="全麦面包+鸡蛋"
-        android:textSize="14sp"
-        android:textStyle="bold"/>
+        android:orientation="vertical"
+        android:padding="12dp"
+        android:background="#FFFFFF">
 
-    <TextView
-        android:id="@+id/tv_dish_calorie"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="350 kcal"
-        android:textSize="12sp"
-        android:textColor="#666666"
-        android:layout_marginTop="8dp"/>
+        <TextView
+            android:id="@+id/tv_dish_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="菜品名称"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="#333"
+            android:maxLines="1"
+            android:ellipsize="end"/>
 
-</LinearLayout>
+        <TextView
+            android:id="@+id/tv_dish_calorie"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="热量"
+            android:textSize="13sp"
+            android:textColor="#FF6B35"
+            android:layout_marginTop="6dp"
+            android:maxLines="1"
+            android:ellipsize="end"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="点击查看详情"
+            android:textSize="11sp"
+            android:textColor="#999"
+            android:layout_marginTop="8dp"
+            android:gravity="center"/>
+
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#F5F5F5">
 
     <!-- 背景图片 -->
     <ImageView
@@ -74,43 +75,24 @@
                 android:id="@+id/card_result"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:visibility="gone"
                 app:cardCornerRadius="8dp"
                 app:cardElevation="4dp"
-                android:visibility="gone"
-                app:layout_constraintTop_toBottomOf="@id/tv_loading"
-                android:layout_marginTop="20dp">
+                app:layout_constraintTop_toBottomOf="@id/tv_loading">
 
-                <LinearLayout
+                <ScrollView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="15dp">
+                    android:maxHeight="300dp">
 
-                    <TextView
-                        android:id="@+id/tv_dish_name"
+                    <LinearLayout
+                        android:id="@+id/ll_dishes_container"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="菜品名称："
-                        android:textSize="18sp"
-                        android:textStyle="bold"/>
-
-                    <TextView
-                        android:id="@+id/tv_calorie"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="卡路里："
-                        android:textSize="16sp"
-                        android:layout_marginTop="10dp"/>
-
-                    <TextView
-                        android:id="@+id/tv_allergens"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="过敏源："
-                        android:textSize="16sp"
-                        android:layout_marginTop="10dp"/>
-
-                </LinearLayout>
+                        android:orientation="vertical"
+                        android:padding="16dp" />
+                </ScrollView>
             </androidx.cardview.widget.CardView>
 
             <TextView
@@ -132,4 +114,4 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
-</FrameLayout>
+</RelativeLayout>

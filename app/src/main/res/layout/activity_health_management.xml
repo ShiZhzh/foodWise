@@ -47,6 +47,7 @@
 
             <!-- 1. 用户信息卡片 -->
             <androidx.cardview.widget.CardView
+                android:id="@+id/card_user_info"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:cardCornerRadius="16dp"
@@ -224,13 +225,34 @@
                     android:padding="20dp"
                     android:orientation="vertical">
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <!-- 修改：添加标题和刷新按钮 -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="智能饮食推荐"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
-                        android:textColor="#333"/>
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+                        
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="智能饮食推荐"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
+                            android:textColor="#333"/>
+                        
+                        <!-- 新增：刷新按钮 -->
+                        <Button
+                            android:id="@+id/btn_refresh_diet"
+                            android:layout_width="wrap_content"
+                            android:layout_height="36dp"
+                            android:text="刷新"
+                            android:textSize="12sp"
+                            android:backgroundTint="#3fe95d"
+                            android:padding="8dp"
+                            android:minWidth="0dp"
+                            android:minHeight="0dp"/>
+                    </LinearLayout>
 
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/rv_diet_recommend"

@@ -2,120 +2,123 @@ package com.example.food_project
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
-import okhttp3.OkHttpClient
+import okhttp3.FormBody
 import okhttp3.Request
 import org.json.JSONObject
-import java.net.URLEncoder
+import android.util.Log // 新增：导入日志类
 
 class FoodRecommendActivity : AppCompatActivity() {
-    // 只保留核心控件，去掉多余声明
     private lateinit var rgRecommendType: RadioGroup
+    private lateinit var etUserNote: EditText
     private lateinit var btnGetRecommend: Button
     private lateinit var tvRecommendEmpty: TextView
     private lateinit var btnRefreshRecommend: Button
-    private lateinit var actvDishSearch: AutoCompleteTextView
-    private lateinit var btnSearchRelated: Button
-    private lateinit var tvRelatedEmpty: TextView
+    private lateinit var actvIngredientSearch: AutoCompleteTextView
+    private lateinit var etIngredientNote: EditText
+    private lateinit var btnSearchByIngredient: Button
+    private lateinit var tvIngredientEmpty: TextView
     private lateinit var btnBack: android.view.View
 
-    // 新增：存储四个RadioButton的FrameLayout容器
     private lateinit var frameWeightLoss: FrameLayout
     private lateinit var frameWeightGain: FrameLayout
     private lateinit var frameHomeCooking: FrameLayout
     private lateinit var frameQuickMeal: FrameLayout
 
-    // 推荐类型（仅用于临时存储选择状态）
     private var selectedRecommendType: String = ""
+    private val historyIngredients = arrayOf("西红柿", "鸡蛋", "土豆", "黄瓜", "鸡胸肉", "三文鱼")
 
-    // 简化历史菜品（仅用于搜索框提示）
-    private val historyDishes = arrayOf("番茄炒蛋", "清蒸鱼", "宫保鸡丁", "凉拌黄瓜", "红烧肉")
-
-    // 定义高度常量（dp转px）
     private val normalHeightDp = 120
     private val expandedHeightDp = 180
     private var normalHeightPx = 0
     private var expandedHeightPx = 0
 
-    private val okHttpClient = OkHttpClient()
+    private var loginUserId: String = ""
+    
+    // 存储推荐结果
+    private val typeRecommendDishes = mutableListOf<DishInfo>()
+    private val ingredientRecommendDishes = mutableListOf<DishInfo>()
+
+    data class DishInfo(
+        val dishName: String,
+        val cookingMethod: String,
+        val calories: String,
+        val protein: String? = null,
+        val fiber: String? = null,
+        val sodium: String,
+        val nutritionHighlight: String? = null,
+        val difficulty: String,
+        val cookingTime: String
+    )
+
+    companion object {
+        private const val TAG = "FoodRecommend" // 日志标签
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_food_recommend)
 
-        // 计算px值
+        val sharedPref = getSharedPreferences("UserPrefs", MODE_PRIVATE)
+        loginUserId = sharedPref.getString("userId", "") ?: ""
+
         normalHeightPx = (normalHeightDp * resources.displayMetrics.density).toInt()
         expandedHeightPx = (expandedHeightDp * resources.displayMetrics.density).toInt()
 
-        // 绑定核心控件
         initViews()
-        // 初始化搜索框提示（仅保留基础功能）
         initSearchBox()
-        // 设置按钮点击事件（空实现，仅提示）
         setButtonListeners()
-        // 单选按钮组监听
         setRadioGroupListener()
     }
 
     private fun initViews() {
         rgRecommendType = findViewById(R.id.rg_recommend_type)
+        etUserNote = findViewById(R.id.et_user_note)
         btnGetRecommend = findViewById(R.id.btn_get_recommend)
         tvRecommendEmpty = findViewById(R.id.tv_recommend_empty)
         btnRefreshRecommend = findViewById(R.id.btn_refresh_recommend)
-        actvDishSearch = findViewById(R.id.actv_dish_search)
-        btnSearchRelated = findViewById(R.id.btn_search_related)
-        tvRelatedEmpty = findViewById(R.id.tv_related_empty)
+        actvIngredientSearch = findViewById(R.id.actv_ingredient_search)
+        etIngredientNote = findViewById(R.id.et_ingredient_note)
+        btnSearchByIngredient = findViewById(R.id.btn_search_by_ingredient)
+        tvIngredientEmpty = findViewById(R.id.tv_ingredient_empty)
         btnBack = findViewById(R.id.btn_back)
 
-        // 获取FrameLayout和RadioButton
         frameWeightLoss = findViewById(R.id.frame_weight_loss)
         frameWeightGain = findViewById(R.id.frame_weight_gain)
         frameHomeCooking = findViewById(R.id.frame_home_cooking)
         frameQuickMeal = findViewById(R.id.frame_quick_meal)
 
-        // 修改：为FrameLayout设置点击监听，使用RadioGroup.check()方法触发选中
-        frameWeightLoss.setOnClickListener {
-            rgRecommendType.check(R.id.rb_weight_loss)
-        }
-        frameWeightGain.setOnClickListener {
-            rgRecommendType.check(R.id.rb_weight_gain)
-        }
-        frameHomeCooking.setOnClickListener {
-            rgRecommendType.check(R.id.rb_home_cooking)
-        }
-        frameQuickMeal.setOnClickListener {
-            rgRecommendType.check(R.id.rb_quick_meal)
-        }
+        frameWeightLoss.setOnClickListener { rgRecommendType.check(R.id.rb_weight_loss) }
+        frameWeightGain.setOnClickListener { rgRecommendType.check(R.id.rb_weight_gain) }
+        frameHomeCooking.setOnClickListener { rgRecommendType.check(R.id.rb_home_cooking) }
+        frameQuickMeal.setOnClickListener { rgRecommendType.check(R.id.rb_quick_meal) }
     }
 
-    // 简化搜索框：仅保留历史菜品提示，去掉复杂逻辑
     private fun initSearchBox() {
-        val adapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, historyDishes)
-        actvDishSearch.setAdapter(adapter)
-        actvDishSearch.threshold = 1 // 输入1个字符提示
+        val adapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, historyIngredients)
+        actvIngredientSearch.setAdapter(adapter)
+        actvIngredientSearch.threshold = 1
     }
 
-    // 单选按钮组监听：记录选择状态并调整高度
     private fun setRadioGroupListener() {
         rgRecommendType.setOnCheckedChangeListener { _, checkedId ->
             selectedRecommendType = when (checkedId) {
                 R.id.rb_weight_loss -> {
                     updateFrameHeights(frameWeightLoss)
-                    "减重低卡"
+                    "低卡"
                 }
                 R.id.rb_weight_gain -> {
                     updateFrameHeights(frameWeightGain)
-                    "增重高蛋白"
+                    "高蛋白"
                 }
                 R.id.rb_home_cooking -> {
                     updateFrameHeights(frameHomeCooking)
-                    "家常菜"
+                    "高纤维"
                 }
                 R.id.rb_quick_meal -> {
                     updateFrameHeights(frameQuickMeal)
-                    "快手餐"
+                    "高钙"
                 }
                 else -> {
                     resetAllFrameHeights()
@@ -125,182 +128,316 @@ class FoodRecommendActivity : AppCompatActivity() {
         }
     }
 
-    // 修改：更新FrameLayout高度和透明度的方法
     private fun updateFrameHeights(selectedFrame: FrameLayout) {
         listOf(frameWeightLoss, frameWeightGain, frameHomeCooking, frameQuickMeal).forEach { frame ->
             val layoutParams = frame.layoutParams
-
             if (frame == selectedFrame) {
-                // 选中的：变大 + 移除半透明遮罩
                 layoutParams.height = expandedHeightPx
-                // 找到半透明遮罩View（第二个子View）并隐藏
                 if (frame.childCount >= 2) {
                     frame.getChildAt(1).visibility = android.view.View.GONE
                 }
             } else {
-                // 未选中的：正常大小 + 显示半透明遮罩
                 layoutParams.height = normalHeightPx
-                // 恢复半透明遮罩
                 if (frame.childCount >= 2) {
                     frame.getChildAt(1).visibility = android.view.View.VISIBLE
                 }
             }
-
             frame.layoutParams = layoutParams
         }
     }
 
-    // 修改：重置所有Frame为正常高度并恢复遮罩
     private fun resetAllFrameHeights() {
         listOf(frameWeightLoss, frameWeightGain, frameHomeCooking, frameQuickMeal).forEach { frame ->
             val layoutParams = frame.layoutParams
             layoutParams.height = normalHeightPx
             frame.layoutParams = layoutParams
-
-            // 恢复半透明遮罩
             if (frame.childCount >= 2) {
                 frame.getChildAt(1).visibility = android.view.View.VISIBLE
             }
         }
     }
 
-    // 按钮点击事件：实现网络请求
     private fun setButtonListeners() {
-        // 返回按钮（添加日志确认触发）
-        btnBack.setOnClickListener {
-            android.util.Log.d("FoodRecommend", "返回按钮被点击")
-            finish()
-        }
+        btnBack.setOnClickListener { finish() }
 
-        // 获取推荐菜品：从后端获取数据
+        // 根据类型获取AI推荐
         btnGetRecommend.setOnClickListener {
             if (selectedRecommendType.isEmpty()) {
                 Toast.makeText(this, "请选择推荐类型", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            // 显示加载状态
-            tvRecommendEmpty.text = "正在加载推荐菜品..."
+            val userNote = etUserNote.text.toString().trim()
+            Log.d(TAG, "开始AI推荐，类型: $selectedRecommendType, 用户备注: $userNote, userId: $loginUserId")
+            
+            tvRecommendEmpty.text = "正在AI推荐菜品...\n(AI思考中，请稍候20-60秒)"
             btnRefreshRecommend.visibility = Button.GONE
+            typeRecommendDishes.clear()
 
             Thread {
                 try {
-                    val encodedType = URLEncoder.encode(selectedRecommendType, "UTF-8")
-                    val request = Request.Builder()
-                        .url("http://10.0.2.2:5000/api/getRecommendDishes?type=$encodedType")
-                        .get()
+                    val requestBody = FormBody.Builder()
+                        .add("dishType", selectedRecommendType)
+                        .add("userId", loginUserId)
+                        .add("userNote", userNote)
                         .build()
 
-                    val response = okHttpClient.newCall(request).execute()
+                    val url = ApiHelper.getUrl("/api/ai/recommendByType")
+                    Log.d(TAG, "请求URL: $url")
+                    
+                    val request = Request.Builder()
+                        .url(url)
+                        .post(requestBody)
+                        .build()
+
+                    Log.d(TAG, "发送AI类型推荐请求...")
+                    val startTime = System.currentTimeMillis()
+                    val response = ApiHelper.getAIClient().newCall(request).execute()
+                    val elapsedTime = System.currentTimeMillis() - startTime
+                    
                     val responseBody = response.body?.string()
+                    Log.d(TAG, "收到响应，耗时: ${elapsedTime}ms")
+                    Log.d(TAG, "响应状态码: ${response.code}")
+                    
+                    if (!responseBody.isNullOrEmpty()) {
+                        Log.d(TAG, "响应内容: $responseBody")
+                    }
 
                     runOnUiThread {
                         if (response.isSuccessful && !responseBody.isNullOrEmpty()) {
                             try {
                                 val json = JSONObject(responseBody)
-                                if (json.has("error")) {
-                                    showDefaultRecommend()
-                                } else {
+                                if (json.optBoolean("success", false)) {
                                     val dishes = json.getJSONArray("dishes")
-                                    val dishList = mutableListOf<String>()
+                                    Log.d(TAG, "推荐菜品数量: ${dishes.length()}")
+                                    
                                     for (i in 0 until dishes.length()) {
-                                        dishList.add(dishes.getString(i))
+                                        val dish = dishes.getJSONObject(i)
+                                        val dishName = dish.getString("dishName")
+                                        Log.d(TAG, "解析菜品 $i: $dishName")
+                                        
+                                        typeRecommendDishes.add(DishInfo(
+                                            dishName,
+                                            dish.getString("cookingMethod"),
+                                            dish.getString("calories"),
+                                            dish.optString("protein", null),
+                                            dish.optString("fiber", null),
+                                            dish.getString("sodium"),
+                                            dish.optString("nutritionHighlight", null),
+                                            dish.getString("difficulty"),
+                                            dish.getString("cookingTime")
+                                        ))
                                     }
-                                    showRecommendResult(dishList)
+                                    showTypeRecommendResult()
+                                } else {
+                                    val error = json.optString("error", "未知错误")
+                                    Log.e(TAG, "AI推荐失败: $error")
+                                    showDefaultTypeRecommend()
                                 }
                             } catch (e: Exception) {
-                                showDefaultRecommend()
+                                Log.e(TAG, "JSON解析异常", e)
+                                showDefaultTypeRecommend()
                             }
                         } else {
-                            showDefaultRecommend()
+                            Log.e(TAG, "响应失败，HTTP ${response.code}: ${response.message}")
+                            showDefaultTypeRecommend()
                         }
                     }
+                } catch (e: java.net.SocketTimeoutException) {
+                    Log.e(TAG, "AI推荐超时", e)
+                    runOnUiThread { 
+                        tvRecommendEmpty.text = "AI推荐超时：服务器响应时间过长(>60秒)，请稍后重试"
+                        Toast.makeText(this, "AI推荐超时，请重试", Toast.LENGTH_LONG).show()
+                    }
+                } catch (e: java.net.UnknownHostException) {
+                    Log.e(TAG, "无法连接到服务器: 主机未知", e)
+                    runOnUiThread {
+                        tvRecommendEmpty.text = "无法连接AI服务器：请检查网络设置"
+                        Toast.makeText(this, "无法连接服务器", Toast.LENGTH_LONG).show()
+                    }
+                } catch (e: java.net.ConnectException) {
+                    Log.e(TAG, "连接服务器失败", e)
+                    runOnUiThread {
+                        tvRecommendEmpty.text = "连接AI服务器失败：服务器可能未启动"
+                        Toast.makeText(this, "连接失败", Toast.LENGTH_LONG).show()
+                    }
                 } catch (e: Exception) {
-                    runOnUiThread { showDefaultRecommend() }
+                    Log.e(TAG, "AI推荐异常: ${e.javaClass.simpleName} - ${e.message}", e)
+                    runOnUiThread { showDefaultTypeRecommend() }
                 }
             }.start()
         }
 
-        // 换一批：重新请求
         btnRefreshRecommend.setOnClickListener {
             btnGetRecommend.performClick()
         }
 
-        // 搜索相关菜品：从后端获取数据
-        btnSearchRelated.setOnClickListener {
-            val dishName = actvDishSearch.text.toString().trim()
-            if (dishName.isEmpty()) {
-                Toast.makeText(this, "请输入/选择菜品名称", Toast.LENGTH_SHORT).show()
+        // 根据食材获取AI推荐
+        btnSearchByIngredient.setOnClickListener {
+            val ingredient = actvIngredientSearch.text.toString().trim()
+            if (ingredient.isEmpty()) {
+                Toast.makeText(this, "请输入食材名称", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            // 显示加载状态
-            tvRelatedEmpty.text = "正在搜索相关菜品..."
+            val userNote = etIngredientNote.text.toString().trim()
+            Log.d(TAG, "开始AI食材推荐，食材: $ingredient, 用户备注: $userNote, userId: $loginUserId")
+            
+            tvIngredientEmpty.text = "正在AI推荐菜品...\n(AI思考中，请稍候20-60秒)"
+            ingredientRecommendDishes.clear()
 
             Thread {
                 try {
-                    val encodedDish = URLEncoder.encode(dishName, "UTF-8")
-                    val request = Request.Builder()
-                        .url("http://10.0.2.2:5000/api/getRelatedDishes?dishName=$encodedDish")
-                        .get()
+                    val requestBody = FormBody.Builder()
+                        .add("ingredient", ingredient)
+                        .add("userId", loginUserId)
+                        .add("userNote", userNote)
                         .build()
 
-                    val response = okHttpClient.newCall(request).execute()
+                    val url = ApiHelper.getUrl("/api/ai/recommendByIngredient")
+                    Log.d(TAG, "请求URL: $url")
+                    
+                    val request = Request.Builder()
+                        .url(url)
+                        .post(requestBody)
+                        .build()
+
+                    Log.d(TAG, "发送AI食材推荐请求...")
+                    val startTime = System.currentTimeMillis()
+                    val response = ApiHelper.getAIClient().newCall(request).execute()
+                    val elapsedTime = System.currentTimeMillis() - startTime
+                    
                     val responseBody = response.body?.string()
+                    Log.d(TAG, "收到响应，耗时: ${elapsedTime}ms")
+                    Log.d(TAG, "响应状态码: ${response.code}")
+                    
+                    if (!responseBody.isNullOrEmpty()) {
+                        Log.d(TAG, "响应内容: $responseBody")
+                    }
 
                     runOnUiThread {
                         if (response.isSuccessful && !responseBody.isNullOrEmpty()) {
                             try {
                                 val json = JSONObject(responseBody)
-                                if (json.has("error")) {
-                                    showDefaultRelated(dishName)
-                                } else {
-                                    val related = json.getJSONArray("relatedDishes")
-                                    val relatedList = mutableListOf<String>()
-                                    for (i in 0 until related.length()) {
-                                        relatedList.add(related.getString(i))
+                                if (json.optBoolean("success", false)) {
+                                    val dishes = json.getJSONArray("dishes")
+                                    Log.d(TAG, "推荐菜品数量: ${dishes.length()}")
+                                    
+                                    for (i in 0 until dishes.length()) {
+                                        val dish = dishes.getJSONObject(i)
+                                        val dishName = dish.getString("dishName")
+                                        Log.d(TAG, "解析菜品 $i: $dishName")
+                                        
+                                        ingredientRecommendDishes.add(DishInfo(
+                                            dishName,
+                                            dish.getString("cookingMethod"),
+                                            dish.getString("calories"),
+                                            null,
+                                            null,
+                                            dish.getString("sodium"),
+                                            null,
+                                            dish.getString("difficulty"),
+                                            dish.getString("cookingTime")
+                                        ))
                                     }
-                                    showRelatedResult(dishName, relatedList)
+                                    showIngredientRecommendResult(ingredient)
+                                } else {
+                                    val error = json.optString("error", "未知错误")
+                                    Log.e(TAG, "AI食材推荐失败: $error")
+                                    showDefaultIngredientRecommend(ingredient)
                                 }
                             } catch (e: Exception) {
-                                showDefaultRelated(dishName)
+                                Log.e(TAG, "JSON解析异常", e)
+                                showDefaultIngredientRecommend(ingredient)
                             }
                         } else {
-                            showDefaultRelated(dishName)
+                            Log.e(TAG, "响应失败，HTTP ${response.code}: ${response.message}")
+                            showDefaultIngredientRecommend(ingredient)
                         }
                     }
+                } catch (e: java.net.SocketTimeoutException) {
+                    Log.e(TAG, "AI食材推荐超时", e)
+                    runOnUiThread { 
+                        tvIngredientEmpty.text = "AI推荐超时：服务器响应时间过长(>60秒)，请稍后重试"
+                        Toast.makeText(this, "AI推荐超时，请重试", Toast.LENGTH_LONG).show()
+                    }
+                } catch (e: java.net.UnknownHostException) {
+                    Log.e(TAG, "无法连接到服务器: 主机未知", e)
+                    runOnUiThread {
+                        tvIngredientEmpty.text = "无法连接AI服务器：请检查网络设置"
+                        Toast.makeText(this, "无法连接服务器", Toast.LENGTH_LONG).show()
+                    }
+                } catch (e: java.net.ConnectException) {
+                    Log.e(TAG, "连接服务器失败", e)
+                    runOnUiThread {
+                        tvIngredientEmpty.text = "连接AI服务器失败：服务器可能未启动"
+                        Toast.makeText(this, "连接失败", Toast.LENGTH_LONG).show()
+                    }
                 } catch (e: Exception) {
-                    runOnUiThread { showDefaultRelated(dishName) }
+                    Log.e(TAG, "AI食材推荐异常: ${e.javaClass.simpleName} - ${e.message}", e)
+                    runOnUiThread { showDefaultIngredientRecommend(ingredient) }
                 }
             }.start()
         }
     }
 
-    // 显示推荐结果
-    private fun showRecommendResult(dishes: List<String>) {
-        val result = dishes.joinToString("、")
-        tvRecommendEmpty.text = "推荐菜品：$result"
+    private fun showTypeRecommendResult() {
+        val result = typeRecommendDishes.joinToString("、") { it.dishName }
+        tvRecommendEmpty.text = "推荐菜品：$result\n点击查看详情"
+        tvRecommendEmpty.setOnClickListener {
+            showDishListDialog(typeRecommendDishes)
+        }
         btnRefreshRecommend.visibility = Button.VISIBLE
-        Toast.makeText(this, "获取成功", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, "AI推荐成功", Toast.LENGTH_SHORT).show()
     }
 
-    // 修改：显示获取失败提示（不再显示默认推荐）
-    private fun showDefaultRecommend() {
-        tvRecommendEmpty.text = "获取失败：无法连接服务器或服务器返回错误"
+    private fun showDefaultTypeRecommend() {
+        tvRecommendEmpty.text = "获取失败：无法连接AI服务器或返回错误"
+        tvRecommendEmpty.setOnClickListener(null)
         btnRefreshRecommend.visibility = Button.GONE
-        Toast.makeText(this, "获取推荐失败", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, "AI推荐失败", Toast.LENGTH_SHORT).show()
     }
 
-    // 显示相关菜品结果
-    private fun showRelatedResult(dishName: String, relatedDishes: List<String>) {
-        val result = relatedDishes.joinToString("、")
-        tvRelatedEmpty.text = "与「$dishName」相关的菜品：$result"
-        Toast.makeText(this, "搜索成功", Toast.LENGTH_SHORT).show()
+    private fun showIngredientRecommendResult(ingredient: String) {
+        val result = ingredientRecommendDishes.joinToString("、") { it.dishName }
+        tvIngredientEmpty.text = "基于「$ingredient」推荐：$result\n点击查看详情"
+        tvIngredientEmpty.setOnClickListener {
+            showDishListDialog(ingredientRecommendDishes)
+        }
+        Toast.makeText(this, "AI推荐成功", Toast.LENGTH_SHORT).show()
     }
 
-    // 修改：显示获取失败提示（不再显示默认相关菜品）
-    private fun showDefaultRelated(dishName: String) {
-        tvRelatedEmpty.text = "获取失败：无法连接服务器或服务器返回错误"
-        Toast.makeText(this, "搜索相关菜品失败", Toast.LENGTH_SHORT).show()
+    private fun showDefaultIngredientRecommend(ingredient: String) {
+        tvIngredientEmpty.text = "获取失败：无法连接AI服务器或返回错误"
+        tvIngredientEmpty.setOnClickListener(null)
+        Toast.makeText(this, "AI推荐失败", Toast.LENGTH_SHORT).show()
+    }
+
+    // 显示菜品列表选择对话框
+    private fun showDishListDialog(dishes: List<DishInfo>) {
+        val dishNames = dishes.map { it.dishName }.toTypedArray()
+        androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle("选择菜品查看详情")
+            .setItems(dishNames) { _, which ->
+                val selectedDish = dishes[which]
+                openDishDetail(selectedDish)
+            }
+            .setNegativeButton("取消", null)
+            .show()
+    }
+
+    // 跳转到菜品详情页
+    private fun openDishDetail(dish: DishInfo) {
+        val intent = Intent(this, DishDetailActivity::class.java)
+        intent.putExtra("dishName", dish.dishName)
+        intent.putExtra("cookingMethod", dish.cookingMethod)
+        intent.putExtra("calories", dish.calories)
+        intent.putExtra("protein", dish.protein)
+        intent.putExtra("fiber", dish.fiber)
+        intent.putExtra("sodium", dish.sodium)
+        intent.putExtra("nutritionHighlight", dish.nutritionHighlight)
+        intent.putExtra("difficulty", dish.difficulty)
+        intent.putExtra("cookingTime", dish.cookingTime)
+        startActivity(intent)
     }
 }
