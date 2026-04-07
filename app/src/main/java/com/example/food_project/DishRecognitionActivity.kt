@@ -20,22 +20,36 @@ import androidx.cardview.widget.CardView
 import okhttp3.FormBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import okhttp3.RequestBody.Companion.asRequestBody
 import org.json.JSONObject
 import java.io.File
 import java.io.FileOutputStream
 
-class DishRecognitionActivity : AppCompatActivity() {
+class DishRecognitionActivity : AppCompatActivity(), AgentContextProvider {
+    private data class RecognizedDishContext(
+        val dishName: String,
+        val calorie: String,
+        val allergens: String,
+        val confidence: Double,
+        val modelType: String,
+        val hasBbox: Boolean
+    ) {
+        fun toMap(): Map<String, Any?> = mapOf(
+            "dishName" to dishName,
+            "calorie" to calorie,
+            "allergens" to allergens,
+            "confidence" to confidence,
+            "modelType" to modelType,
+            "hasBbox" to hasBbox
+        )
+    }
+
     private lateinit var ivDish: ImageView
     private lateinit var tvLoading: TextView
     private lateinit var cardResult: CardView
     private lateinit var llDishesContainer: LinearLayout
     private val okHttpClient = OkHttpClient()
     private var currentImageBitmap: Bitmap? = null
-
-    // 百度API密钥(与菜单识别共用)
-    private val API_KEY = "dMrpDLIFCVO9S2kNF1wsL501"
-    private val SECRET_KEY = "r04IBpCsn1Mx9lH9oMnYtJYtVx6d86FK"
+    private val lastRecognizedDishes = mutableListOf<RecognizedDishContext>()
 
     private val pickImageLauncher = registerForActivityResult(
         ActivityResultContracts.GetContent()
@@ -50,6 +64,7 @@ class DishRecognitionActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_dish_recognition)
+        AgentEntryBinder.bind(this)
 
         ivDish = findViewById(R.id.iv_dish)
         tvLoading = findViewById(R.id.tv_loading)
@@ -105,6 +120,7 @@ class DishRecognitionActivity : AppCompatActivity() {
                             } else if (json.getBoolean("success")) {
                                 val dishCount = json.getInt("dishCount")
                                 val dishesArray = json.getJSONArray("dishes")
+                                cacheLatestDishes(dishesArray)
                                 
                                 // 绘制边界框
                                 drawBoundingBoxes(dishesArray)
@@ -291,6 +307,7 @@ class DishRecognitionActivity : AppCompatActivity() {
     }
 
     private fun showErrorResult(message: String) {
+        lastRecognizedDishes.clear()
         llDishesContainer.removeAllViews()
         val errorView = TextView(this).apply {
             text = message
@@ -300,6 +317,43 @@ class DishRecognitionActivity : AppCompatActivity() {
         }
         llDishesContainer.addView(errorView)
         cardResult.visibility = View.VISIBLE
+    }
+
+    private fun cacheLatestDishes(dishesArray: org.json.JSONArray) {
+        lastRecognizedDishes.clear()
+        for (i in 0 until dishesArray.length()) {
+            val dish = dishesArray.getJSONObject(i)
+            lastRecognizedDishes.add(
+                RecognizedDishContext(
+                    dishName = dish.optString("dishName", ""),
+                    calorie = dish.optString("calorie", ""),
+                    allergens = dish.optString("allergens", ""),
+                    confidence = dish.optDouble("confidence", 0.0),
+                    modelType = dish.optString("modelType", "unknown"),
+                    hasBbox = !dish.isNull("bbox")
+                )
+            )
+        }
+    }
+
+    override fun buildAgentPageContext(): AgentPageContext {
+        val summary = if (lastRecognizedDishes.isEmpty()) {
+            "当前在菜品图片识别页，暂未识别到菜品。"
+        } else {
+            val dishNames = lastRecognizedDishes.take(4).joinToString("、") { it.dishName }
+            "当前在菜品图片识别页，最近识别到：$dishNames。"
+        }
+
+        return AgentPageContext(
+            pageKey = "dish_recognition",
+            pageTitle = "菜品图片识别",
+            contextType = "dish",
+            contextPayload = mapOf(
+                "dishes" to lastRecognizedDishes.map { it.toMap() },
+                "recognizedCount" to lastRecognizedDishes.size
+            ),
+            contextSummary = summary
+        )
     }
 
     private fun uriToBitmap(uri: Uri): Bitmap? {

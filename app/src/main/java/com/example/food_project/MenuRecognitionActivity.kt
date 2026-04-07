@@ -13,19 +13,19 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import okhttp3.*;
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import org.json.JSONObject
 import java.io.File
 import java.io.FileOutputStream
 import java.net.URLEncoder
 
-class MenuRecognitionActivity : AppCompatActivity() {
+class MenuRecognitionActivity : AppCompatActivity(), AgentContextProvider {
     private lateinit var ivMenu: ImageView
     private lateinit var tvLoading: TextView
     private lateinit var rvMenuItems: RecyclerView
     private val okHttpClient = OkHttpClient()
     private val menuItems = mutableListOf<String>()
     private lateinit var adapter: MenuDishAdapter
+    private var lastOcrText: String = ""
 
     // 百度API密钥
     private val API_KEY = "dMrpDLIFCVO9S2kNF1wsL501"
@@ -43,6 +43,7 @@ class MenuRecognitionActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_menu_recognition)
+        AgentEntryBinder.bind(this)
 
         ivMenu = findViewById(R.id.iv_menu)
         tvLoading = findViewById(R.id.tv_loading)
@@ -66,6 +67,7 @@ class MenuRecognitionActivity : AppCompatActivity() {
     private fun recognizeMenu(uri: Uri) {
         tvLoading.text = "正在识别菜单..."
         tvLoading.visibility = View.VISIBLE
+        lastOcrText = ""
         menuItems.clear()
         adapter.notifyDataSetChanged()
         
@@ -118,18 +120,24 @@ class MenuRecognitionActivity : AppCompatActivity() {
                         try {
                             val json = JSONObject(responseBody)
                             if (json.has("error_code")) {
+                                lastOcrText = ""
                                 Toast.makeText(this, "识别失败: ${json.getString("error_msg")}", Toast.LENGTH_LONG).show()
                             } else {
                                 // 解析OCR结果
                                 val wordsResult = json.getJSONArray("words_result")
+                                val ocrLines = mutableListOf<String>()
                                 for (i in 0 until wordsResult.length()) {
                                     val item = wordsResult.getJSONObject(i)
                                     val text = item.getString("words").trim()
+                                    if (text.isNotEmpty()) {
+                                        ocrLines.add(text)
+                                    }
                                     // 过滤掉价格等无关信息,只保留菜品名
                                     if (text.isNotEmpty() && !text.matches(Regex(".*\\d+.*元.*"))) {
                                         menuItems.add(text)
                                     }
                                 }
+                                lastOcrText = ocrLines.joinToString("\n")
                                 adapter.notifyDataSetChanged()
                                 if (menuItems.isEmpty()) {
                                     Toast.makeText(this, "未识别到菜品信息", Toast.LENGTH_SHORT).show()
@@ -251,5 +259,24 @@ class MenuRecognitionActivity : AppCompatActivity() {
             e.printStackTrace()
             null
         }
+    }
+
+    override fun buildAgentPageContext(): AgentPageContext {
+        val summary = if (menuItems.isEmpty()) {
+            "当前在菜单识别页，暂未识别到菜单条目。"
+        } else {
+            "当前在菜单识别页，最近识别到 ${menuItems.size} 个菜单项。"
+        }
+
+        return AgentPageContext(
+            pageKey = "menu_recognition",
+            pageTitle = "菜单识别",
+            contextType = "menu",
+            contextPayload = mapOf(
+                "ocrText" to lastOcrText,
+                "menuItems" to menuItems.toList()
+            ),
+            contextSummary = summary
+        )
     }
 }

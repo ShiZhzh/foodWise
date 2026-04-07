@@ -10,6 +10,7 @@ class FoodAnalysisActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_food_analysis)
+        AgentEntryBinder.bind(this)
 
         findViewById<Button>(R.id.btn_menu_recognition).setOnClickListener {
             startActivity(Intent(this, MenuRecognitionActivity::class.java))

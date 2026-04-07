@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/agent_taskbar_root"
+    android:layout_width="match_parent"
+    android:layout_height="72dp"
+    android:background="@drawable/bg_agent_taskbar"
+    android:elevation="10dp">
+
+    <ImageButton
+        android:id="@+id/btn_agent_entry"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_gravity="center"
+        android:background="@android:color/transparent"
+        android:contentDescription="打开健康助手"
+        android:scaleType="centerInside"
+        android:src="@drawable/ic_agent_robot"
+        android:tint="#FFFFFF" />
+</FrameLayout>

@@ -21,6 +21,10 @@
         android:supportsRtl="true"
         android:theme="@style/Base.Theme.Food_project"
         android:usesCleartextTraffic="true">
+        <activity
+            android:name=".AgentChatActivity"
+            android:exported="false"
+            android:windowSoftInputMode="stateHidden|adjustResize" />
         <!-- 新增：菜品详情Activity -->
         <activity
             android:name=".DishDetailActivity"

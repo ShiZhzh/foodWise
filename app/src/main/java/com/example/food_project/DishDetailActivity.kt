@@ -19,6 +19,7 @@ class DishDetailActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_dish_detail)
+        AgentEntryBinder.bind(this)
 
         initViews()
         loadDishData()

@@ -28,6 +28,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        AgentEntryBinder.bind(this)
 
         val sharedPref = getSharedPreferences("UserPrefs", MODE_PRIVATE)
         userId = sharedPref.getString("userId", "") ?: ""

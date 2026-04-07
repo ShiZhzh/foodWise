@@ -43,6 +43,7 @@ class UserDetailActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_user_detail)
+        AgentEntryBinder.bind(this)
         
         val sharedPref = getSharedPreferences("UserPrefs", MODE_PRIVATE)
         loginUserId = sharedPref.getString("userId", "") ?: ""
