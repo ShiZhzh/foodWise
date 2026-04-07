@@ -103,7 +103,9 @@ class AgentChatActivity : AppCompatActivity() {
     }
 
     private fun initList() {
-        chatAdapter = AgentChatAdapter(messageList)
+        chatAdapter = AgentChatAdapter(messageList) { position ->
+            toggleAdviceDetail(position)
+        }
         rvChat.layoutManager = LinearLayoutManager(this)
         rvChat.adapter = chatAdapter
     }
@@ -133,23 +135,9 @@ class AgentChatActivity : AppCompatActivity() {
                 )
                 currentSessionId = response.sessionId
 
-                val finalText = buildString {
-                    append(response.answer)
-                    if (response.riskLevel.isNotBlank()) {
-                        append("\n\n风险等级：")
-                        append(response.riskLevel)
-                    }
-                    if (response.actionItems.isNotEmpty()) {
-                        append("\n\n建议行动：")
-                        response.actionItems.forEach { item ->
-                            append("\n- ")
-                            append(item)
-                        }
-                    }
-                }
-
                 runOnUiThread {
-                    addAssistantMessage(finalText)
+                    addAssistantMessage(response.answer)
+                    addAdviceDetailMessage(response.riskLevel, response.actionItems)
                     setSendingState(false)
                 }
             } catch (e: Exception) {
@@ -171,6 +159,29 @@ class AgentChatActivity : AppCompatActivity() {
         messageList.add(AgentChatMessage(role = "assistant", content = content))
         chatAdapter.notifyItemInserted(messageList.lastIndex)
         rvChat.scrollToPosition(messageList.lastIndex)
+    }
+
+    private fun addAdviceDetailMessage(riskLevel: String, actionItems: List<String>) {
+        if (riskLevel.isBlank() && actionItems.isEmpty()) {
+            return
+        }
+        messageList.add(
+            AgentChatMessage(
+                role = "assistant",
+                content = "",
+                adviceDetail = AgentAdviceDetail(riskLevel = riskLevel, actionItems = actionItems),
+                isDetailExpanded = false
+            )
+        )
+        chatAdapter.notifyItemInserted(messageList.lastIndex)
+        rvChat.scrollToPosition(messageList.lastIndex)
+    }
+
+    private fun toggleAdviceDetail(position: Int) {
+        val item = messageList.getOrNull(position) ?: return
+        if (item.adviceDetail == null) return
+        item.isDetailExpanded = !item.isDetailExpanded
+        chatAdapter.notifyItemChanged(position)
     }
 
     private fun setSendingState(isSending: Boolean) {
